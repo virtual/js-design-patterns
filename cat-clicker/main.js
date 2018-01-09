@@ -26,10 +26,12 @@ function handleClick(e) {
 function displayCats() {
   document.getElementById("animals").innerHTML = displayAnimals(animals.cats);
   var photos = Array.prototype.slice.call(document.getElementsByTagName('figure'));
-  photos.forEach((e,i)=> {
-    e.addEventListener('click', function () {
-      handleClick("photo"+i);
-  }, false);
+  photos.forEach((e, i) => {
+    e.addEventListener('click', (function (index) {
+      return function () {
+        handleClick("photo" + index);
+      };
+    })(i));
   });
 }
 
