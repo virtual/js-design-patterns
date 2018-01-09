@@ -12,34 +12,25 @@ let animals = {
 function displayAnimals(obj) {
   var html = '';
   obj.map((e, i) => {
-    html += '<figure id="catphoto' + i + '"> \
+    html += '<figure id="photo' + i + '"> \
       <figcaption>' + e.name + ': <span class="clickcount">0</span> clicks</figcaption> \
-      <img class="catphoto' + i + '" src=' + e.image + ' alt="' + e.name + '" /> \
+      <img src=' + e.image + ' alt="' + e.name + '" /> \
     </figure>';
   });
   return html;
 }
-
 function handleClick(e) {
-  console.log(document.getElementById(e).childNodes[1].childNodes[1])
-  //var clickCount = parseInt(document.getElementById(e).childNodes[1].childNodes[1].innerHTML) + 1;
-  console.log(e)
   var span = document.getElementById(e).childNodes[1].getElementsByTagName('span')[0];
   span.innerHTML = parseInt(span.innerHTML) + 1;
 }
-
-
 function displayCats() {
   document.getElementById("animals").innerHTML = displayAnimals(animals.cats);
   var photos = Array.prototype.slice.call(document.getElementsByTagName('figure'));
-  
   photos.forEach((e,i)=> {
-    console.log(e);
     e.addEventListener('click', function () {
-      handleClick("catphoto"+i);
+      handleClick("photo"+i);
   }, false);
   });
 }
-
 
 displayCats();
