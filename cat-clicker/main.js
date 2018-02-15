@@ -1,5 +1,9 @@
-let animals = {
-  "cats": [{
+/* MODEL */
+// Model is an object literal with current cat set to null
+let model = {
+  prevCat: null,
+  currentCat: null,
+  cats: [{
       "image": "images/alexandru-zdrobau-176844.jpg",
       "name": "Whiskers",
       "count": 0
@@ -31,46 +35,82 @@ let animals = {
     }
   ]
 }
-let prev;
+/* MODEL end */
 
-function displayGridItem(e, i) {
-  let id = (i !== undefined) ? "photo"+i : "thefeature";
- console.log(e) 
- return '<figure id="'+id + '"> \
- <figcaption>' + e.name + ': <span class="clickcount">' + e.count + '</span> clicks</figcaption> \
- <img src=' + e.image + ' alt="' + e.name + '" /> \
-</figure>';
+/* CONTROLLER */
+let controller = {
+  init: function () {
+    model.currentCat = model.cats[0];
+    catView.init();
+    catListView.init();
+  },
+  getCurrentCat: function () {
+    return model.currentCat;
+  },
+  setCurrentCat: function (cat) {
+    model.currentCat = cat;
+    catView.render();
+  },
+  getAllCats: function () {
+    return model.cats;
+  },
+  incrementCatCount: function () {
+    model.currentCat.count++;
+    catView.render();
+  }
 }
-function displayGrid(obj) {
-  var html = '';
-  obj.map((e, i) => {
-    html += displayGridItem(e, i);
-    
-  });
-  return html;
-}
-function handleClick(e) {
-  var span = document.getElementById(e).childNodes[1].getElementsByTagName('span')[0];
-  if (prev) document.getElementById(prev).className = ""
-  document.getElementById(e).className = "active"
-  let count = parseInt(span.innerHTML) + 1;
-  span.innerHTML = count;
-  prev = e;
-}
-function displayCats() {
-  document.getElementById("animals").innerHTML = displayGrid(animals.cats);
-  var photos = Array.prototype.slice.call(document.getElementsByTagName('figure'));
-  photos.forEach((e, i) => {
-    e.addEventListener('click', (function (index) {
-      return function () {
-        handleClick("photo" + index);
-        animals.cats[index].count = parseInt(animals.cats[index].count) + 1;
-        document.getElementById("feature").innerHTML = displayGridItem(animals.cats[index])
-        console.log(animals.cats[index].count)
-      };
-    })(i));
-  });
-}
+/* CONTROLLER end */
 
-displayCats();
-document.getElementById("feature").innerHTML = displayGridItem(animals.cats[0])
+/* VIEW Featured Cat */
+let catView = {
+  init: function () {
+    // Now we can always reference these elements
+    this.catEl = document.getElementById('cat');
+    this.catNameEl = document.getElementById('cat-name');
+    this.catCountEl = document.getElementById('cat-count');
+    this.catImgEl = document.getElementById('cat-img');
+
+    this.catImgEl.addEventListener('click', ((e) => {
+      controller.incrementCatCount(e);
+    }));
+
+    this.render();
+  },
+  render: function () {
+    let featuredCat = controller.getCurrentCat();
+
+    this.catNameEl.innerHTML = featuredCat.name;
+    this.catCountEl.innerHTML = featuredCat.count;
+    this.catImgEl.src = featuredCat.image;
+  }
+}
+/* VIEW Featured Cat end */
+
+/* VIEW Cat List */
+let catListView = {
+  init: function () {
+    this.catListEl = document.getElementById('cat-list');
+
+    this.render();
+  },
+  render: function () {
+    let cats = controller.getAllCats();
+    this.catListEl.innerHTML = ''; // empty list
+
+    cats.map((cat) => {
+      let li = document.createElement('li');
+      li.innerHTML = cat.name;
+      li.addEventListener('click', (function (catCopy) {
+        return function () {
+          controller.setCurrentCat(catCopy);
+          catView.render();
+        };
+      })(cat));
+      this.catListEl.appendChild(li);
+    });
+  }
+}
+/* VIEW Cat List end */
+
+// Make it all run
+controller.init();
